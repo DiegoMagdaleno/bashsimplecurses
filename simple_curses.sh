@@ -16,6 +16,7 @@
 #enabling keyboard input) by Markus Mikkolainen
 
 VERSION="dev"
+SHOULD_REFRESH_SCREEN=1
 
 bsc_create_buffer(){
     # Try to use SHM, then $TMPDIR, then /tmp
@@ -474,11 +475,11 @@ vumeter(){
         red="${red}|"
     done
     red=${red:1}
-    
+
     for i in `seq 0 $(($todo))`;do
         rest="${rest}."
     done
-    
+
     [ "$red" == ""  ] && bsc__multiappend "left" "[" $incolor "black" "${green}" $okcolor "black" "${rest}]${text}" $incolor "black"
     [ "$red" != ""  ] && bsc__multiappend "left" "[" $incolor "black" "${green}" $okcolor "black" "${red}" $overcolor "black" "${rest}]${text}" $incolor "black"
 }
@@ -666,12 +667,12 @@ function usage() {
     read -d '' <<-EOF
 Usage: $script_name [options]
   -c,  --crop       Title is spread over multiple lines if necessary
-                    Using -c, the title will be cropped to fit in 
+                    Using -c, the title will be cropped to fit in
                     window width
   -h,  --help       Displays this help message
   -hh, --more-help  Displays extended help message with more documentation
   -t,  --time [t]   Sleep time, in seconds, when no "update" function has
-                    been defined, this option is used when calling the 
+                    been defined, this option is used when calling the
                     "update" function
   -s,  --scroll     Set presentation to scrolling mode.
   -q,  --quiet      There will be no warning messages at all
@@ -773,9 +774,9 @@ __display() {
     [ $VERBOSE -gt 0 ] && [ -f "$BSC_STDERR" ] && cat $BSC_STDERR && rm $BSC_STDERR
 
     # call update function
-    # TODO: be able to get the pid of the update function to kill it on 
+    # TODO: be able to get the pid of the update function to kill it on
     #       WINCH signal
-    #       note that the update function cannot get global variables 
+    #       note that the update function cannot get global variables
     #       if we use "&", so "wait" command cannot be the solution
     $update_fn "$time"
     retval=$?
@@ -805,7 +806,7 @@ main_loop (){
         trap "__force_refresh" WINCH
     fi
 
-    while true; do
+    while [ $SHOULD_REFRESH_SCREEN -eq 1 ]; do
         __display
     done
 }
